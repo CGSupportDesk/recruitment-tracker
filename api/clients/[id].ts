@@ -1,4 +1,4 @@
-import { deleteRow, handleApiError, methodNotAllowed, readBody, requireAuth, send, updateRow, type ApiRequest, type ApiResponse } from '../_shared';
+import { deleteRow, handleApiError, methodNotAllowed, readBody, requireAuth, send, updateRow, type ApiRequest, type ApiResponse } from '../_shared.js';
 
 const fields = ['client_name', 'onboarding_date', 'contact_person', 'contact_email', 'contact_phone', 'client_status', 'notes'];
 

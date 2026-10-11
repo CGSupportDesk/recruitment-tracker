@@ -1,4 +1,4 @@
-import { handleApiError, methodNotAllowed, requireAuth, send, type ApiRequest, type ApiResponse } from '../_shared';
+import { handleApiError, methodNotAllowed, requireAuth, send, type ApiRequest, type ApiResponse } from '../_shared.js';
 
 export default function handler(req: ApiRequest, res: ApiResponse) {
   if (req.method !== 'GET') return methodNotAllowed(res);

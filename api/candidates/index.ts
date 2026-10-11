@@ -1,4 +1,4 @@
-import { handleApiError, insertRow, methodNotAllowed, readBody, requireAuth, send, type ApiRequest, type ApiResponse } from '../_shared';
+import { handleApiError, insertRow, methodNotAllowed, readBody, requireAuth, send, type ApiRequest, type ApiResponse } from '../_shared.js';
 
 const fields = ['role_id', 'candidate_name', 'date_shared', 'status', 'remarks'];
 

@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import { db, handleApiError, methodNotAllowed, readBody, send, signProfile, type ApiRequest, type ApiResponse } from '../_shared';
+import { db, handleApiError, methodNotAllowed, readBody, send, signProfile, type ApiRequest, type ApiResponse } from '../_shared.js';
 
 export default async function handler(req: ApiRequest, res: ApiResponse) {
   if (req.method !== 'POST') return methodNotAllowed(res);

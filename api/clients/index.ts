@@ -1,4 +1,4 @@
-import { handleApiError, insertRow, methodNotAllowed, readBody, requireAuth, send, type ApiRequest, type ApiResponse } from '../_shared';
+import { handleApiError, insertRow, methodNotAllowed, readBody, requireAuth, send, type ApiRequest, type ApiResponse } from '../_shared.js';
 
 const fields = ['client_name', 'onboarding_date', 'contact_person', 'contact_email', 'contact_phone', 'client_status', 'notes'];
 
