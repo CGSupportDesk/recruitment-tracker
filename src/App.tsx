@@ -1,9 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
-import type { Session } from '@supabase/supabase-js';
 import { AppShell } from './components/AppShell';
-import { isSupabaseConfigured, supabase } from './lib/supabase';
-import { fetchProfile, getSession } from './lib/recruitmentApi';
+import { checkApiHealth, getCurrentProfile, getStoredToken, type AuthProfile } from './lib/apiClient';
 import { useRecruitmentData } from './lib/useRecruitmentData';
 import { ClientsPage } from './pages/ClientsPage';
 import { DashboardPage } from './pages/DashboardPage';
@@ -12,7 +10,6 @@ import { ReportsPage } from './pages/ReportsPage';
 import { RolesPage } from './pages/RolesPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { SetupRequired } from './pages/SetupRequired';
-import type { Profile } from './types/recruitment';
 
 function LoadingScreen() {
   return (
@@ -33,39 +30,43 @@ function DataBoundary({ children, loading, error }: { children: ReactNode; loadi
 }
 
 export default function App() {
-  const [session, setSession] = useState<Session | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [booting, setBooting] = useState(isSupabaseConfigured);
-  const data = useRecruitmentData(Boolean(session));
+  const [isConfigured, setIsConfigured] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(Boolean(getStoredToken()));
+  const [profile, setProfile] = useState<AuthProfile | null>(null);
+  const [booting, setBooting] = useState(true);
+  const data = useRecruitmentData(isAuthenticated);
 
   useEffect(() => {
-    if (!isSupabaseConfigured || !supabase) return;
-
-    getSession()
-      .then((currentSession) => {
-        setSession(currentSession);
-        if (currentSession?.user.id) {
-          return fetchProfile(currentSession.user.id).then(setProfile);
+    checkApiHealth()
+      .then((health) => {
+        setIsConfigured(health.configured);
+        if (health.configured && getStoredToken()) {
+          return getCurrentProfile().then(({ profile: currentProfile }) => {
+            setProfile(currentProfile);
+            setIsAuthenticated(true);
+          });
         }
         return undefined;
       })
-      .finally(() => setBooting(false));
-
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, nextSession) => {
-      setSession(nextSession);
-      if (nextSession?.user.id) {
-        void fetchProfile(nextSession.user.id).then(setProfile);
-      } else {
+      .catch(() => {
+        setIsAuthenticated(false);
         setProfile(null);
-      }
-    });
-
-    return () => listener.subscription.unsubscribe();
+      })
+      .finally(() => setBooting(false));
   }, []);
 
-  if (!isSupabaseConfigured) return <SetupRequired />;
+  if (!booting && !isConfigured) return <SetupRequired />;
   if (booting) return <LoadingScreen />;
-  if (!session) return <LoginPage />;
+  if (!isAuthenticated) {
+    return (
+      <LoginPage
+        onLogin={(nextProfile) => {
+          setProfile(nextProfile);
+          setIsAuthenticated(true);
+        }}
+      />
+    );
+  }
 
   return (
     <Routes>
@@ -102,7 +103,19 @@ export default function App() {
             </DataBoundary>
           }
         />
-        <Route path="/settings" element={<SettingsPage email={session.user.email} profile={profile} />} />
+        <Route
+          path="/settings"
+          element={
+            <SettingsPage
+              email={profile?.email}
+              profile={profile}
+              onLogout={() => {
+                setIsAuthenticated(false);
+                setProfile(null);
+              }}
+            />
+          }
+        />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

@@ -1,8 +1,8 @@
 import { useState, type FormEvent } from 'react';
 import { Lock, LogIn } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { login, type AuthProfile } from '../lib/apiClient';
 
-export function LoginPage() {
+export function LoginPage({ onLogin }: { onLogin: (profile: AuthProfile) => void }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -12,8 +12,12 @@ export function LoginPage() {
     event.preventDefault();
     setError(null);
     setLoading(true);
-    const { error: authError } = await supabase!.auth.signInWithPassword({ email, password });
-    if (authError) setError(authError.message);
+    try {
+      const session = await login(email, password);
+      onLogin(session.profile);
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'Unable to sign in.');
+    }
     setLoading(false);
   }
 

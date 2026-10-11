@@ -1,11 +1,12 @@
 # Closing Gap Recruitment Tracker
 
-Internal recruitment tracker for Beyond ClosingGap Private Limited. Built with React, TypeScript, Vite, Tailwind CSS, Lucide React, Recharts, and Supabase.
+Internal recruitment tracker for Beyond ClosingGap Private Limited. Built with React, TypeScript, Vite, Tailwind CSS, Lucide React, Recharts, Neon Postgres, and Vercel serverless API routes.
 
 ## What is included
 
-- Protected email/password login through Supabase Auth.
-- Clients, roles, and candidate submissions stored in Supabase PostgreSQL.
+- Protected email/password login through the app's Vercel API.
+- Clients, roles, and candidate submissions stored in Neon Postgres.
+- Server-side database access through `DATABASE_URL`; the browser never receives the Neon connection string.
 - Automatic role aging and completion-date freezing for Filled, Closed, and Cancelled roles.
 - Candidate counts derived from candidate submissions, not manually entered.
 - Dashboard KPIs, charts, oldest active roles, recent candidates, and recent roles.
@@ -21,47 +22,57 @@ Internal recruitment tracker for Beyond ClosingGap Private Limited. Built with R
 npm install
 ```
 
-2. Create a Supabase project.
+2. Create a Neon project and copy its pooled or direct connection string.
 
-3. Run the SQL migration in `supabase/migrations/202610120001_closing_gap_recruitment.sql`.
+3. Run the SQL migration in `neon/migrations/202610120001_closing_gap_recruitment.sql` from the Neon SQL editor.
 
-4. In Supabase Authentication, keep public signup disabled. Create staff users manually from the Supabase dashboard.
-
-5. Copy `.env.example` to `.env.local` and fill in:
+4. Generate a password hash for the first staff user.
 
 ```bash
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-public-anon-key
+node scripts/hash-password.mjs "your-secure-password"
 ```
 
-6. Start the app.
+5. Insert the first admin user in Neon SQL editor, using the generated hash.
+
+```sql
+insert into public.profiles (email, full_name, password_hash, role)
+values ('admin@closinggap.in', 'Closing Gap Admin', '<generated-hash>', 'admin');
+```
+
+6. Copy `.env.example` to `.env.local` and fill in:
 
 ```bash
-npm run dev
+DATABASE_URL=postgresql://user:password@host.neon.tech/dbname?sslmode=require
+JWT_SECRET=replace-with-a-long-random-secret
+```
+
+7. Start the app with Vercel's local dev server so the `/api` functions are available.
+
+```bash
+npx vercel dev
 ```
 
 ## Vercel deployment through Git
 
-1. Commit and push this folder to your Git provider.
+1. Push this repository to GitHub.
 2. Import the repository in Vercel.
-3. Set the project root to `closing-gap-recruitment-tracker` if this repository contains multiple folders.
-4. Add the environment variables from `.env.example`.
-5. Use the default Vite build settings:
+3. Add the environment variables from `.env.example`.
+4. Use the default Vite build settings:
    - Build command: `npm run build`
    - Output directory: `dist`
-6. Deploy.
+5. Deploy.
 
-## Supabase notes
+## Neon notes
 
-- The browser only uses the public anon key.
-- Row Level Security is enabled on all application tables.
-- Authenticated staff can manage operational records.
-- Profiles are created automatically when Supabase Auth users are created.
+- The app uses Vercel API routes in `api/` for all database reads and writes.
+- `DATABASE_URL` and `JWT_SECRET` must be Vercel environment variables.
+- Auth is app-managed with bcrypt password hashes in the `profiles` table and signed 12-hour JWT sessions.
+- Create staff users manually by inserting rows into `profiles` with a bcrypt hash.
 - The app never displays internal role IDs or candidate IDs.
 
 ## Validation checklist
 
-After connecting Supabase, verify:
+After connecting Neon, verify:
 
 - Create a client with an onboarding date.
 - Add multiple roles to the same client.

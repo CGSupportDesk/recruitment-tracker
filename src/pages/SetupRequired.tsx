@@ -9,7 +9,7 @@ export function SetupRequired() {
             <Database size={20} />
           </div>
           <div>
-            <h1 className="text-xl font-semibold text-ink">Connect Supabase to continue</h1>
+            <h1 className="text-xl font-semibold text-ink">Connect Neon to continue</h1>
             <p className="text-sm text-slate-500">The tracker is built for live database-backed operations.</p>
           </div>
         </div>
@@ -17,7 +17,7 @@ export function SetupRequired() {
           <div className="rounded-lg border border-slate-100 p-4">
             <Database className="mb-3 text-brand-600" size={20} />
             <h2 className="font-semibold">Run migration</h2>
-            <p className="mt-2 text-sm leading-6 text-slate-500">Apply the SQL in supabase/migrations to create tables, triggers, indexes, and RLS.</p>
+            <p className="mt-2 text-sm leading-6 text-slate-500">Apply the SQL in neon/migrations to create tables, triggers, indexes, and staff users.</p>
           </div>
           <div className="rounded-lg border border-slate-100 p-4">
             <Github className="mb-3 text-brand-600" size={20} />
@@ -27,7 +27,7 @@ export function SetupRequired() {
           <div className="rounded-lg border border-slate-100 p-4">
             <Rocket className="mb-3 text-brand-600" size={20} />
             <h2 className="font-semibold">Set Vercel env</h2>
-            <p className="mt-2 text-sm leading-6 text-slate-500">Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in Vercel before deployment.</p>
+            <p className="mt-2 text-sm leading-6 text-slate-500">Add DATABASE_URL and JWT_SECRET in Vercel before deployment.</p>
           </div>
         </div>
       </div>
