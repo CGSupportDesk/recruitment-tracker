@@ -1,4 +1,4 @@
-import { deleteRow, handleApiError, methodNotAllowed, readBody, requireAuth, send, updateRow, type ApiRequest, type ApiResponse } from '../_shared.js';
+import { deleteRow, handleApiError, methodNotAllowed, readBody, requireAuth, send, updateRow, type ApiRequest, type ApiResponse } from './_shared.js';
 
 const fields = ['role_id', 'candidate_name', 'date_shared', 'status', 'remarks'];
 
@@ -7,6 +7,10 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
   try {
     requireAuth(req);
+
+    if (!id) {
+      return send(res, 400, { error: 'Candidate id is required.' });
+    }
 
     if (req.method === 'PATCH') {
       const row = await updateRow('candidate_submissions', id, readBody(req), fields);

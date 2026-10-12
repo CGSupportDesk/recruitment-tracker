@@ -14,11 +14,11 @@ export async function createClientRecord(payload: Omit<Client, 'id' | 'created_a
 }
 
 export async function updateClientRecord(id: string, payload: Partial<Omit<Client, 'id' | 'created_at' | 'updated_at'>>) {
-  await apiFetch(`/api/clients/${id}`, { method: 'PATCH', body: JSON.stringify(payload) });
+  await apiFetch(`/api/client?id=${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify(payload) });
 }
 
 export async function deleteClientRecord(id: string) {
-  await apiFetch(`/api/clients/${id}`, { method: 'DELETE' });
+  await apiFetch(`/api/client?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
 }
 
 export async function createRoleRecord(payload: Omit<Role, 'id' | 'completion_date' | 'created_at' | 'updated_at'>) {
@@ -26,11 +26,11 @@ export async function createRoleRecord(payload: Omit<Role, 'id' | 'completion_da
 }
 
 export async function updateRoleRecord(id: string, payload: Partial<Omit<Role, 'id' | 'created_at' | 'updated_at'>>) {
-  await apiFetch(`/api/roles/${id}`, { method: 'PATCH', body: JSON.stringify(payload) });
+  await apiFetch(`/api/role?id=${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify(payload) });
 }
 
 export async function deleteRoleRecord(id: string) {
-  await apiFetch(`/api/roles/${id}`, { method: 'DELETE' });
+  await apiFetch(`/api/role?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
 }
 
 export async function createCandidateRecord(payload: Omit<CandidateSubmission, 'id' | 'created_at' | 'updated_at'>) {
@@ -41,9 +41,9 @@ export async function updateCandidateRecord(
   id: string,
   payload: Partial<Omit<CandidateSubmission, 'id' | 'created_at' | 'updated_at'>>,
 ) {
-  await apiFetch(`/api/candidates/${id}`, { method: 'PATCH', body: JSON.stringify(payload) });
+  await apiFetch(`/api/candidate?id=${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify(payload) });
 }
 
 export async function deleteCandidateRecord(id: string) {
-  await apiFetch(`/api/candidates/${id}`, { method: 'DELETE' });
+  await apiFetch(`/api/candidate?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
 }
