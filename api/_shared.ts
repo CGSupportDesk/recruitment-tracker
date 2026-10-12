@@ -76,6 +76,25 @@ export function cleanPayload<T extends Record<string, unknown>>(payload: T, allo
   return Object.fromEntries(Object.entries(payload).filter(([key, value]) => allowed.includes(key) && value !== undefined));
 }
 
+const dateOnlyFields = new Set(['onboarding_date', 'role_received_date', 'completion_date', 'date_shared']);
+
+function toDateOnly(value: unknown) {
+  if (value == null || value === '') return value;
+  if (value instanceof Date) return value.toISOString().slice(0, 10);
+  if (typeof value !== 'string') return value;
+
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? value : date.toISOString().slice(0, 10);
+}
+
+export function normalizeRow<T extends Record<string, unknown>>(row: T): T {
+  return Object.fromEntries(Object.entries(row).map(([key, value]) => [key, dateOnlyFields.has(key) ? toDateOnly(value) : value])) as T;
+}
+
+export function normalizeRows<T extends Record<string, unknown>>(rows: T[]) {
+  return rows.map(normalizeRow);
+}
+
 export async function insertRow(table: string, payload: Record<string, unknown>, allowed: readonly string[]) {
   const sql = db();
   const cleaned = cleanPayload(payload, allowed);
@@ -85,7 +104,7 @@ export async function insertRow(table: string, payload: Record<string, unknown>,
   const placeholders = columns.map((_, index) => `$${index + 1}`).join(', ');
   const query = `insert into public.${table} (${columns.join(', ')}) values (${placeholders}) returning *`;
   const rows = await sql.query(query, Object.values(cleaned));
-  return rows[0];
+  return normalizeRow(rows[0]);
 }
 
 export async function updateRow(table: string, id: string, payload: Record<string, unknown>, allowed: readonly string[]) {
@@ -99,7 +118,7 @@ export async function updateRow(table: string, id: string, payload: Record<strin
   const rows = await sql.query(query, [...Object.values(cleaned), id]);
 
   if (!rows.length) throw new Error('Record not found.');
-  return rows[0];
+  return normalizeRow(rows[0]);
 }
 
 export async function deleteRow(table: string, id: string) {

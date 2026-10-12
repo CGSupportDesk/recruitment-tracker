@@ -1,4 +1,4 @@
-import { db, handleApiError, methodNotAllowed, requireAuth, send, type ApiRequest, type ApiResponse } from './_shared.js';
+import { db, handleApiError, methodNotAllowed, normalizeRows, requireAuth, send, type ApiRequest, type ApiResponse } from './_shared.js';
 
 export default async function handler(req: ApiRequest, res: ApiResponse) {
   if (req.method !== 'GET') return methodNotAllowed(res);
@@ -12,7 +12,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       sql.query('select * from public.candidate_submissions order by date_shared desc'),
     ]);
 
-    send(res, 200, { clients, roles, candidates });
+    send(res, 200, { clients: normalizeRows(clients), roles: normalizeRows(roles), candidates: normalizeRows(candidates) });
   } catch (reason) {
     handleApiError(res, reason);
   }
