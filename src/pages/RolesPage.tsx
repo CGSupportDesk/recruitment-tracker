@@ -3,7 +3,7 @@ import { Edit3, FileText, Plus, Search, Trash2, UserPlus } from 'lucide-react';
 import { AgingBadge, Badge } from '../components/Badge';
 import { CandidateForm, RoleForm } from '../components/Forms';
 import { Modal } from '../components/Modal';
-import { candidateStatuses, clientName, countsForRole, formatDate, roleAging, roleStatuses } from '../lib/domain';
+import { candidateStatuses, clientName, countsForRole, formatDate, roleAging, roleStatuses, toDateInputValue } from '../lib/domain';
 import type { CandidateStatus, CandidateSubmission, Client, Role, RoleStatus } from '../types/recruitment';
 
 interface RolesPageProps {
@@ -236,7 +236,7 @@ export function RolesPage({ clients, roles, candidates, actions }: RolesPageProp
                         <input
                           type="date"
                           className="mt-1 rounded-md border border-slate-200 px-2 py-1 text-xs text-slate-500"
-                          value={candidate.date_shared}
+                          value={toDateInputValue(candidate.date_shared)}
                           onChange={(event) => actions.updateCandidate(candidate.id, { date_shared: event.target.value })}
                         />
                       </div>

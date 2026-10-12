@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Download } from 'lucide-react';
 import { AgingBadge, Badge } from '../components/Badge';
-import { clientName, countsForRole, downloadCsv, formatDate, roleAging, roleStatuses } from '../lib/domain';
+import { clientName, countsForRole, downloadCsv, formatDate, formatMonth, roleAging, roleStatuses, toDateInputValue } from '../lib/domain';
 import type { CandidateSubmission, Client, Role } from '../types/recruitment';
 
 interface ReportsPageProps {
@@ -28,10 +28,11 @@ export function ReportsPage({ clients, roles, candidates }: ReportsPageProps) {
   const filteredRoles = useMemo(
     () =>
       roles.filter((role) => {
+        const receivedDate = toDateInputValue(role.role_received_date);
         const matchesClient = clientId === 'All' || role.client_id === clientId;
         const matchesStatus = status === 'All' || role.role_status === status;
-        const matchesFrom = !from || role.role_received_date >= from;
-        const matchesTo = !to || role.role_received_date <= to;
+        const matchesFrom = !from || receivedDate >= from;
+        const matchesTo = !to || receivedDate <= to;
         return matchesClient && matchesStatus && matchesFrom && matchesTo;
       }),
     [clientId, from, roles, status, to],
@@ -76,7 +77,7 @@ export function ReportsPage({ clients, roles, candidates }: ReportsPageProps) {
     if (reportType === 'Monthly Recruitment Activity') {
       const months = new Map<string, { Month: string; 'New Roles': number; 'Candidates Shared': number; 'Roles Filled': number }>();
       filteredRoles.forEach((role) => {
-        const key = new Date(`${role.role_received_date}T00:00:00`).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
+        const key = formatMonth(role.role_received_date, 'numeric');
         const row = months.get(key) ?? { Month: key, 'New Roles': 0, 'Candidates Shared': 0, 'Roles Filled': 0 };
         row['New Roles'] += 1;
         row['Candidates Shared'] += candidates.filter((candidate) => candidate.role_id === role.id).length;

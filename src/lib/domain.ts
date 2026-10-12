@@ -13,22 +13,40 @@ export const activeRoleStatuses: RoleStatus[] = ['Open', 'In Progress', 'On Hold
 export const terminalRoleStatuses: RoleStatus[] = ['Filled', 'Closed', 'Cancelled'];
 export const candidateStatuses: CandidateStatus[] = ['Pending', 'Selected', 'Rejected'];
 
-export function toDateInputValue(date = new Date()) {
-  return date.toISOString().slice(0, 10);
+function parseDateValue(value: Date | string | null | undefined) {
+  if (!value) return null;
+
+  const date = value instanceof Date ? value : new Date(/^\d{4}-\d{2}-\d{2}$/.test(value) ? `${value}T00:00:00` : value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+export function toDateInputValue(date: Date | string = new Date()) {
+  return parseDateValue(date)?.toISOString().slice(0, 10) ?? '';
 }
 
 export function formatDate(value: string | null | undefined) {
-  if (!value) return 'Not set';
+  const date = parseDateValue(value);
+  if (!date) return 'Not set';
+
   return new Intl.DateTimeFormat('en-IN', {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
-  }).format(new Date(`${value}T00:00:00`));
+  }).format(date);
+}
+
+export function formatMonth(value: string | null | undefined, year: '2-digit' | 'numeric' = '2-digit') {
+  const date = parseDateValue(value);
+  if (!date) return 'Not set';
+
+  return date.toLocaleDateString('en-IN', { month: 'short', year });
 }
 
 export function daysBetween(start: string, end = toDateInputValue()) {
-  const startDate = new Date(`${start}T00:00:00`);
-  const endDate = new Date(`${end}T00:00:00`);
+  const startDate = parseDateValue(start);
+  const endDate = parseDateValue(end);
+  if (!startDate || !endDate) return 0;
+
   return Math.max(0, Math.floor((endDate.getTime() - startDate.getTime()) / 86_400_000));
 }
 

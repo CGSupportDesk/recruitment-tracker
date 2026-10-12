@@ -36,7 +36,7 @@ export function ClientForm({ client, onSubmit, onDone }: ClientFormProps) {
     if (client) {
       setForm({
         client_name: client.client_name,
-        onboarding_date: client.onboarding_date,
+        onboarding_date: toDateInputValue(client.onboarding_date),
         contact_person: client.contact_person ?? '',
         contact_email: client.contact_email ?? '',
         contact_phone: client.contact_phone ?? '',
@@ -148,7 +148,7 @@ export function RoleForm({ clients, role, defaultClientId, onSubmit, onDone }: R
       setForm({
         client_id: role.client_id,
         job_title: role.job_title,
-        role_received_date: role.role_received_date,
+        role_received_date: toDateInputValue(role.role_received_date),
         budget: role.budget ?? '',
         openings: role.openings,
         experience_required: role.experience_required ?? '',
@@ -279,7 +279,7 @@ interface CandidateFormProps {
 export function CandidateForm({ candidate, onSubmit, onDone, roleId }: CandidateFormProps) {
   const [form, setForm] = useState({
     candidate_name: candidate?.candidate_name ?? '',
-    date_shared: candidate?.date_shared ?? toDateInputValue(),
+    date_shared: candidate?.date_shared ? toDateInputValue(candidate.date_shared) : toDateInputValue(),
     status: (candidate?.status ?? 'Pending') as CandidateStatus,
     remarks: candidate?.remarks ?? '',
   });

@@ -14,7 +14,7 @@ import {
   YAxis,
 } from 'recharts';
 import { AgingBadge, Badge } from '../components/Badge';
-import { activeRoleStatuses, agingBand, clientName, countsForRoles, formatDate, isActiveRole, roleAging, roleStatuses } from '../lib/domain';
+import { activeRoleStatuses, agingBand, clientName, countsForRoles, formatDate, formatMonth, isActiveRole, roleAging, roleStatuses } from '../lib/domain';
 import type { CandidateSubmission, Client, Role } from '../types/recruitment';
 
 interface DashboardProps {
@@ -39,8 +39,7 @@ function KpiCard({ label, value, detail, icon: Icon }: { label: string; value: s
 }
 
 function monthKey(value: string) {
-  const date = new Date(`${value}T00:00:00`);
-  return date.toLocaleDateString('en-IN', { month: 'short', year: '2-digit' });
+  return formatMonth(value);
 }
 
 export function DashboardPage({ clients, roles, candidates }: DashboardProps) {
